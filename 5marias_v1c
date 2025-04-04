@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>5 MARIAS – PEDRA PRA TODO LADO</title>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <style>
+    body { font-family: monospace; padding: 2em; background: #f9f9f9; }
+    button {
+      padding: 0.6em 1.2em;
+      font-size: 1em;
+      margin-top: 1em;
+    }
+    pre {
+      background: #e0e0e0;
+      padding: 1em;
+      border-radius: 10px;
+      white-space: pre-wrap;
+      margin-top: 1em;
+    }
+    h1 { font-size: 1.8em; text-transform: uppercase; }
+  </style>
+</head>
+<body>
+
+  <h1>5 MARIAS – SORTEADOR DE PEDRAS</h1>
+  <button id="sortear" disabled>SORTEAR 5 VERSOS</button>
+  <pre id="resultado">CARREGANDO ARQUIVO PEDRA.CSV...</pre>
+
+  <script>
+    let versos = [];
+
+    // Carrega automaticamente o CSV hospedado no mesmo diretório
+    fetch('pedra.csv')
+      .then(response => response.text())
+      .then(csvText => {
+        Papa.parse(csvText, {
+          header: true,
+          skipEmptyLines: true,
+          complete: function(results) {
+            versos = results.data.map(row => ({
+              codigo: row['Código'],
+              verso: row['Verso com "pedra"']
+            }));
+            document.getElementById('sortear').disabled = false;
+            document.getElementById('resultado').textContent = "ARQUIVO CARREGADO. PRESSIONE O BOTÃO PRA VER AS PEDRAS.";
+          }
+        });
+      })
+      .catch(err => {
+        document.getElementById('resultado').textContent = "ERRO AO CARREGAR pedra.csv";
+        console.error("Erro ao carregar CSV:", err);
+      });
+
+    document.getElementById('sortear').addEventListener('click', function() {
+      if (versos.length === 0) return;
+
+      let sorteados = [];
+      for (let i = 0; i < 5; i++) {
+        const rand = Math.floor(Math.random() * versos.length);
+        let cod = versos[rand].codigo || "????";
+        let ver = versos[rand].verso || "(VERSO VAZIO)";
+        sorteados.push(`${cod.toUpperCase().padEnd(7)} ${ver.toUpperCase()}`);
+      }
+
+      document.getElementById('resultado').textContent = sorteados.join('\n');
+    });
+  </script>
+
+</body>
+</html>
