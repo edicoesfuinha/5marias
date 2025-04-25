@@ -3,12 +3,10 @@
 let versosSalvos = [];
 
 function carregarVersosSalvos(usuario) {
-  // Simulação temporária: tenta buscar via API de issues
-  fetch(`https://api.github.com/repos/edicoesfuinha/5marias/issues?state=all&creator=${usuario}`)
+  fetch('https://39104695-9c68-4a0e-8e27-1d977ab03ba8-00-3i268f2jd6kx.janeway.replit.dev/todos')
     .then(res => res.json())
     .then(data => {
-      const relevantes = data.filter(issue => issue.title === 'salvar-verso');
-      versosSalvos = relevantes.map(issue => issue.body);
+      versosSalvos = data.filter(v => v.usuario === usuario);
       atualizarExibicaoSalvos();
       atualizarStatusCredito();
     })
@@ -21,25 +19,21 @@ function salvarVerso() {
   if (!usuarioAtual || versosSalvos.length >= 5) return;
 
   const versoCompleto = document.getElementById('versoAtual').textContent.trim();
-  const conteudo = formatarConteudoSalvo(versoCompleto);
+  const payload = {
+    usuario: usuarioAtual,
+    texto: formatarConteudoSalvo(versoCompleto)
+  };
 
-  fetch('https://api.github.com/repos/edicoesfuinha/5marias/issues', {
+  fetch('https://39104695-9c68-4a0e-8e27-1d977ab03ba8-00-3i268f2jd6kx.janeway.replit.dev/salvar', {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${GITHUB_TOKEN}`
+      'Content-Type': 'application/json'
     },
-    body: JSON.stringify({
-      title: 'salvar-verso',
-      body: conteudo
-    })
+    body: JSON.stringify(payload)
   })
-    .then(res => {
-      if (!res.ok) throw new Error('Erro ao criar issue');
-      return res.json();
-    })
+    .then(res => res.json())
     .then(() => {
-      versosSalvos.push(conteudo);
+      versosSalvos.push(payload);
       atualizarExibicaoSalvos();
       atualizarStatusCredito();
       document.getElementById('btnSalvar').disabled = true;
@@ -48,7 +42,8 @@ function salvarVerso() {
 }
 
 function atualizarExibicaoSalvos() {
-  document.getElementById('versosSalvos').textContent = versosSalvos.join('\n\n');
+  const blocos = versosSalvos.map(v => v.texto);
+  document.getElementById('versosSalvos').textContent = blocos.join('\n\n');
 }
 
 function atualizarStatusCredito() {
