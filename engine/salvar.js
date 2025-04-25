@@ -24,7 +24,7 @@ function salvarVerso() {
     texto: formatarConteudoSalvo(versoCompleto)
   };
 
-  fetch('https://39104695-9c68-4a0e-8e27-1d977ab03ba8-00-3i268f2jd6kx.janeway.replit.dev/salvar', {
+  fetch('https://39104695-9c68-4a0e-8e27-1d977ab03ba8-00-3i268rf2jd6kx.janeway.replit.dev/salvar', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
