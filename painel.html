@@ -1,57 +1,64 @@
-// salvar.js
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Painel dos Versos Salvos</title>
+  <style>
+    body {
+      font-family: monospace;
+      background: #f9f9f9;
+      padding: 2em;
+      color: #222;
+    }
+    .verso {
+      border: 1px dashed #aaa;
+      padding: 1em;
+      margin-bottom: 1em;
+      background: #fff;
+      white-space: pre-wrap;
+    }
+    .filtro {
+      margin-bottom: 1em;
+    }
+  </style>
+</head>
+<body>
+  <h1>Painel dos Versos Salvos</h1>
+  <div class="filtro">
+    <label for="filtro">Filtrar por poeta:</label>
+    <input type="text" id="filtro" placeholder="ex: leila">
+  </div>
+  <div id="lista"></div>
 
-let versosSalvos = [];
+  <script>
+    const endpoint = 'https://39104695-9c68-4a0e-8e27-1d977ab03ba8-00-3i268f2jd6kx.janeway.replit.dev/todos';
 
-function carregarVersosSalvos(usuario) {
-  fetch('https://39104695-9c68-4a0e-8e27-1d977ab03ba8-00-3i268f2jd6kx.janeway.replit.dev/todos')
-    .then(res => res.json())
-    .then(data => {
-      versosSalvos = data.filter(v => v.usuario === usuario);
-      atualizarExibicaoSalvos();
-      atualizarStatusCredito();
-    })
-    .catch(() => {
-      document.getElementById('versosSalvos').textContent = 'Erro ao carregar versos salvos.';
+    function carregarVersos(filtro = '') {
+      fetch(endpoint)
+        .then(res => res.json())
+        .then(data => {
+          const lista = document.getElementById('lista');
+          lista.innerHTML = '';
+
+          const filtrados = data.filter(v => v.usuario.toLowerCase().includes(filtro.toLowerCase()));
+
+          filtrados.reverse().forEach(item => {
+            const bloco = document.createElement('div');
+            bloco.className = 'verso';
+            bloco.textContent = `@${item.usuario}\n${item.timestamp}\n\n${item.texto}`;
+            lista.appendChild(bloco);
+          });
+        })
+        .catch(() => {
+          document.getElementById('lista').textContent = 'Erro ao carregar versos.';
+        });
+    }
+
+    document.getElementById('filtro').addEventListener('input', (e) => {
+      carregarVersos(e.target.value);
     });
-}
 
-function salvarVerso() {
-  if (!usuarioAtual || versosSalvos.length >= 5) return;
-
-  const versoCompleto = document.getElementById('versoAtual').textContent.trim();
-  const payload = {
-    usuario: usuarioAtual,
-    texto: formatarConteudoSalvo(versoCompleto)
-  };
-
-  fetch('https://39104695-9c68-4a0e-8e27-1d977ab03ba8-00-3i268f2jd6kx.janeway.replit.dev/salvar', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(payload)
-  })
-    .then(res => res.json())
-    .then(() => {
-      versosSalvos.push(payload);
-      atualizarExibicaoSalvos();
-      atualizarStatusCredito();
-      document.getElementById('btnSalvar').disabled = true;
-    })
-    .catch(err => alert('Erro ao salvar poema: ' + err.message));
-}
-
-function atualizarExibicaoSalvos() {
-  const blocos = versosSalvos.map(v => v.texto);
-  document.getElementById('versosSalvos').textContent = blocos.join('\n\n');
-}
-
-function atualizarStatusCredito() {
-  const restantes = 5 - versosSalvos.length;
-  if (restantes <= 0) {
-    document.getElementById('btnSalvar').disabled = true;
-    document.getElementById('status').textContent = `Você salvou os 5 versos. Obrigado por jogar!`;
-  } else {
-    document.getElementById('status').textContent = `Você já salvou ${versosSalvos.length} de 5 versos.`;
-  }
-}
+    carregarVersos();
+  </script>
+</body>
+</html>
