@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>X MARIAS – PROTÓTIPO</title>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script defer src="engine/pedra-core.js"></script>
+  <script defer src="engine/util.js"></script>
+  <script defer src="engine/login.js"></script>
+  <script defer src="engine/salvar.js"></script>
+  <style>
+    body { font-family: monospace; padding: 2em; background: #f9f9f9; }
+    h1 { font-size: 1.8em; text-transform: uppercase; }
+    input, button { margin: 0.5em 0; padding: 0.4em; font-size: 1em; }
+    pre { background: #e0e0e0; padding: 1em; border-radius: 10px; white-space: pre-wrap; }
+    #painel, #versoBox, #controle { margin-top: 1.5em; }
+    details { margin-top: 1em; }
+  </style>
+</head>
+<body>
+  <h1>X MARIAS – PROTÓTIPO</h1>
+
+  <div id="loginBox">
+    <label for="user">Login:</label>
+    <input type="text" id="user" placeholder="digite seu nome">
+    <button onclick="logar()">Entrar</button>
+  </div>
+
+  <div id="painel" style="display:none">
+    <div id="status"></div>
+    <div id="versoBox">
+      <button onclick="sortearVerso()">SORTEAR</button>
+      <pre id="versoAtual">Nenhum verso sorteado ainda.</pre>
+      <button onclick="salvarVerso()" id="btnSalvar" disabled>SALVAR</button>
+    </div>
+
+    <details>
+      <summary>Ver versos já salvos</summary>
+      <pre id="versosSalvos">Carregando...</pre>
+    </details>
+  </div>
+</body>
+</html>
