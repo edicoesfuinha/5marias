@@ -3,16 +3,18 @@
 let versosSalvos = [];
 
 function carregarVersosSalvos(usuario) {
-  // Simulação local, substituir por leitura da API futuramente
-  const arquivosMock = localStorage.getItem(`salvos_${usuario}`);
-  if (arquivosMock) {
-    versosSalvos = JSON.parse(arquivosMock);
-  } else {
-    versosSalvos = [];
-  }
-
-  atualizarExibicaoSalvos();
-  atualizarStatusCredito();
+  // Simulação temporária: tenta buscar via API de issues
+  fetch(`https://api.github.com/repos/edicoesfuinha/5marias/issues?state=all&creator=${usuario}`)
+    .then(res => res.json())
+    .then(data => {
+      const relevantes = data.filter(issue => issue.title === 'salvar-verso');
+      versosSalvos = relevantes.map(issue => issue.body);
+      atualizarExibicaoSalvos();
+      atualizarStatusCredito();
+    })
+    .catch(() => {
+      document.getElementById('versosSalvos').textContent = 'Erro ao carregar versos salvos.';
+    });
 }
 
 function salvarVerso() {
@@ -21,12 +23,28 @@ function salvarVerso() {
   const versoCompleto = document.getElementById('versoAtual').textContent.trim();
   const conteudo = formatarConteudoSalvo(versoCompleto);
 
-  versosSalvos.push(conteudo);
-  localStorage.setItem(`salvos_${usuarioAtual}`, JSON.stringify(versosSalvos));
-
-  atualizarExibicaoSalvos();
-  atualizarStatusCredito();
-  document.getElementById('btnSalvar').disabled = true;
+  fetch('https://api.github.com/repos/edicoesfuinha/5marias/issues', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${GITHUB_TOKEN}`
+    },
+    body: JSON.stringify({
+      title: 'salvar-verso',
+      body: conteudo
+    })
+  })
+    .then(res => {
+      if (!res.ok) throw new Error('Erro ao criar issue');
+      return res.json();
+    })
+    .then(() => {
+      versosSalvos.push(conteudo);
+      atualizarExibicaoSalvos();
+      atualizarStatusCredito();
+      document.getElementById('btnSalvar').disabled = true;
+    })
+    .catch(err => alert('Erro ao salvar poema: ' + err.message));
 }
 
 function atualizarExibicaoSalvos() {
