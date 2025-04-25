@@ -1,13 +1,14 @@
 // login.js
 
-// Simulação inicial de usuários válidos
-const usuariosValidos = {
-  "leila": true,
-  "gato3": true,
-  "zeca": true
-};
-
+let usuariosValidos = {};
 let usuarioAtual = null;
+
+// carrega usuarios.json externamente
+fetch('usuarios.json')
+  .then(res => res.json())
+  .then(data => {
+    usuariosValidos = data;
+  });
 
 function logar() {
   const input = document.getElementById('user').value.trim().toLowerCase();
@@ -21,9 +22,8 @@ function logar() {
     document.getElementById('status').textContent = `Olá, ${usuarioAtual}. Você pode sortear versos e salvar até 5.`;
 
     carregarCSV(() => {
-      carregarVersosSalvos(usuarioAtual); // função virá no salvar.js
+      carregarVersosSalvos(usuarioAtual);
     });
-
   } else {
     alert('Usuário inválido. Tente novamente.');
   }
