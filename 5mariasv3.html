@@ -1,13 +1,29 @@
-<script>
-  carregarCSV('pedra.csv', function(dados) {
-    document.getElementById('sortear').disabled = false;
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>5 MARIAS</title>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script src="pedra-core.js"></script>  <!-- carrega função carregarCSV -->
+  <script src="util.js"></script>        <!-- carrega função sortearVersos -->
+</head>
+<body>
+  <h1>5 MARIAS</h1>
+  <button id="sortear" disabled>SORTEAR</button>
+  <pre id="resultado">AGUARDE...</pre>
 
-    document.getElementById('sortear').addEventListener('click', function () {
-      const sorteados = sortearVersos(dados, 5);
-      const linhas = sorteados.map(v =>
-        `${v.codigo.padEnd(7)} ${v.verso}`
-      );
-      document.getElementById('resultado').textContent = linhas.join('\n');
+  <script>
+    carregarCSV('pedra.csv', function(dados) {
+      document.getElementById('sortear').disabled = false;
+
+      document.getElementById('sortear').addEventListener('click', function () {
+        const sorteados = sortearVersos(dados, 5);
+        const linhas = sorteados.map(v =>
+          `${v.codigo.padEnd(7)} ${v.verso}`
+        );
+        document.getElementById('resultado').textContent = linhas.join('\n');
+      });
     });
-  });
-</script>
+  </script>
+</body>
+</html>
