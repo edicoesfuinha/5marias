@@ -21,10 +21,19 @@ function carregarCSV(callback) {
 }
 
 function sortearVerso() {
-  if (versos.length === 0) return;
-  const index = Math.floor(Math.random() * versos.length);
-  const sorteado = versos[index];
-  document.getElementById('versoAtual').textContent = `${sorteado.codigo.padEnd(7)} ${sorteado.verso}`;
+  if (versos.length < 5) return;
+
+  const sorteados = [];
+  while (sorteados.length < 5) {
+    const i = Math.floor(Math.random() * versos.length);
+    const candidato = versos[i];
+    if (!sorteados.includes(candidato)) {
+      sorteados.push(candidato);
+    }
+  }
+
+  const textoFinal = sorteados.map(v => `${v.codigo.padEnd(7)} ${v.verso}`).join('\n');
+  document.getElementById('versoAtual').textContent = textoFinal;
   document.getElementById('btnSalvar').disabled = false;
 }
 
