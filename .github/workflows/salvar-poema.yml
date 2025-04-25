@@ -1,0 +1,27 @@
+name: Salvar poema
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  criar-poema:
+    if: github.event.issue.title == 'salvar-verso'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clonar repositório
+        uses: actions/checkout@v3
+
+      - name: Criar arquivo com verso salvo
+        run: |
+          mkdir -p salvos
+          FILE="salvos/${{ github.event.issue.user.login }}$(date +%s).txt"
+          echo "${{ github.event.issue.body }}" > $FILE
+          git config user.name "fuinha-bot"
+          git config user.email "bot@fuinha.art"
+          git add $FILE
+          git commit -m "salvando poema de ${{ github.event.issue.user.login }}"
+          git push
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
